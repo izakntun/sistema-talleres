@@ -4,7 +4,7 @@
     <div class="col-md-9">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <span>Registro del participante</span>
+                <span><i class="fa fa-user-plus" aria-hidden="true"></i> Registrar cliente nuevo</span>
             </div>
             <div class="panel-body">
                 <form action="{{ url('create') }}" class="form-group" method="post">

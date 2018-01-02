@@ -70,7 +70,7 @@ desired effect
         </a>
 
         <!-- Header Navbar -->
-        @include('layout.top_menu')
+        @include('layout.top')
     </header>
     <!-- Left side column. contains the logo and sidebar -->
     <aside class="main-sidebar">
