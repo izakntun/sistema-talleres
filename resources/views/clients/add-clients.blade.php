@@ -8,7 +8,7 @@
             </div>
             <div class="panel-body">
                 {!! Form::open(['route' => 'create']) !!}
-                @include('clients.partials.form')
+                    @include('clients.partials.form')
                 {!! Form::close() !!}
             </div>
         </div>
