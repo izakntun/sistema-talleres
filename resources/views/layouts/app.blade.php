@@ -1,3 +1,4 @@
+{{ Debugbar::addMessage(config('app.name')) }}
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
