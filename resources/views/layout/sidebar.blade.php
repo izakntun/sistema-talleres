@@ -30,7 +30,7 @@
             <li class="header">Menú</li>
             <!-- Optionally, you can add icons to the links -->
             <li @if(Request::is('/')) class="active" @endif><a href="{{ Route('/') }}"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
-            <li @if(Request::is('add')) class="active" @endif><a href="{{ Route('clients') }}"><i class="fa fa-user"></i> <span>Clientes</span></a></li>
+            <li @if(Request::is('add') || Request::is('clients')) class="active" @endif><a href="{{ Route('clients') }}"><i class="fa fa-user"></i> <span>Clientes</span></a></li>
             <li class="treeview">
                 <a href="#"><i class="fa fa-link"></i> <span>Catálogo</span>
                     <span class="pull-right-container">
