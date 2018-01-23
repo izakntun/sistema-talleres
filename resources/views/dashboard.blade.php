@@ -6,7 +6,13 @@
                 <span><i class="fa fa-dashboard" aria-hidden="true"></i> Panel de administración</span>
             </div>
             <div class="panel-body">
-                <h1>Aquí irán los datos del dashboard</h1>
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                You are logged in!
             </div>
         </div>
     </div>

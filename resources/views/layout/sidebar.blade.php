@@ -7,7 +7,7 @@
                 <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image"> {{--Aquí deberá de ir dinamicamente la foto del usuario o logo de la empresa--}}
             </div>
             <div class="pull-left info">
-                <p>Freddy Cantún</p> {{--Aquí deberá de ir dinamicamente el nombre del usuario--}}
+                <p>{{ Auth::user()->name }}</p> {{--Aquí deberá de ir dinamicamente el nombre del usuario--}}
                 <!-- Status -->
                 <a href="#"><i class="fa fa-circle text-success"></i> Administrador</a> {{--Aquí deberá de ir dinamicamente el rol del usuario--}}
             </div>

@@ -8,6 +8,7 @@ class ClientController extends Controller
 {
     public function index()
     {
+        $logger = Logger()->debug('logger');
         return view('clients.principal');
     }
 
