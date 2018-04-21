@@ -40,13 +40,10 @@
                             <td>{{ $result->nombre }}</td>
                             <td>
                                 <a href="{{ route('edit_ticket', $result->id) }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                <form style="display: inline;" method="POST" action="{{ route('delete_ticket', $result->id) }}">
-                                    {!! method_field('DELETE') !!}
-                                    {!! csrf_field() !!}
-                                    <button class="btn btn-link" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                                </form>
+                                <a class="btn btn-link btn-delete" href=""><i class="fa fa-trash"></i></a>
                             </td>
                         </tr>
+                        @include('registro_ticket.modal_delete')
                     @endforeach
                     </thead>
                 </table>
@@ -60,11 +57,9 @@
         $(document).ready(function(){
             var services = {};
             listAllTickets = function() {
-                console.log($('meta[name="csrf-token"]').attr('content'));
-
                 $.ajax({
-                    type : 'POST',
-                    url : '{{ route('get_all') }}',
+                    type : 'GET',
+                    url : '{{ url('get_all') }}',
                     data : { _token : '{{ csrf_token() }}' },
                     success: function (res) {
                         console.log(res);
@@ -76,6 +71,10 @@
             };
             listAllTickets();
 
+            $('body').on('click', '.btn-delete', function (e) {
+                e.preventDefault();
+                $('#modal-delete').modal();
+            });
         });
     </script>
 @endsection

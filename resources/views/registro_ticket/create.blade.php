@@ -52,6 +52,16 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <label for="entidad_federativa">Entidad federativa</label>
+                                <select class="form-control select2" name="entidad_federativa" id="entidad_federativa">
+                                    @foreach($entidades as $entidad)
+                                        <option value="{{ $entidad->id }}">{{ $entidad->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <label for="medio_consulta">Medio de consulta</label>
                                 <select class="form-control select2" name="medio_consulta" id="medio_consulta">
                                     @foreach($consulta as $con)
@@ -66,9 +76,7 @@
                             <div class="form-group">
                                 <label for="ente_publico">Ente público</label>
                                 <select class="form-control select2" name="ente_publico" id="ente_publico">
-                                    @foreach($entes as $ente)
-                                        <option value="{{ $ente->id }}">{{ $ente->nombre }}</option>
-                                    @endforeach
+
                                 </select>
                             </div>
                         </div>
@@ -158,8 +166,21 @@
         $(document).ready(function(){
             $('.select2').select2();
 
-
-
+            $('body').on('change', '#entidad_federativa', function () {
+                var id = $(this).val();
+                var ente = $('#ente_publico');
+                ente.empty();
+                $.ajax({
+                    type : 'GET',
+                    url : '{{ url('entes') }}/'+id,
+                    success : function (res) {
+                        ente.empty();
+                        $(res).each(function (i, v) {
+                            ente.append(`<option value="${v.id}">${v.nombre}</option>`);
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection

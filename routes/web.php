@@ -20,6 +20,7 @@ Route::put('update/{id}', 'HomeController@update')->name('update');
 Route::delete('ticket/{id}', 'HomeController@destroy')->name('delete_ticket');
 Route::get('get_all', 'HomeController@allTickets')->name('get_all');
 Route::get('excel', 'HomeController@excel')->name('excel');
+Route::get('entes/{id}', 'HomeController@allEntes')->name('entes');
 
 /** Clientes */
 //Route::get('clients', 'ClientController@index')->name('clients');

@@ -40,6 +40,29 @@ class HomeController extends Controller
         return view('registro_ticket.dashboard', compact('results'));
     }
 
+    public function allTickets()
+    {
+        if (Request()->ajax())
+        {
+            $result = \DB::table('control_ticket AS ct')
+                ->select('ct.id', 'u.name AS name', 'ct.asunto AS asunto', 'ep.nombre AS nombre', 'tep.descripcion AS descripcion', 'ef.nombre AS nombre')
+                ->join('users AS u', 'ct.users_id', '=', 'u.id')
+                ->join('ente_publico AS ep', 'ct.ente_publico_id', '=', 'ep.id')
+                ->join('entidad_federativa AS ef', 'ep.entidad_federativa_id', '=', 'ef.id')
+                ->join('tipo_ente_publico AS tep', 'ep.tipo_ente_publico_id', '=', 'tep.id')->get();
+            return response()->json($result);
+        }
+    }
+
+    public function allEntes($id)
+    {
+        if (Request()->ajax())
+        {
+            $entes = \DB::table('ente_publico')->where('entidad_federativa_id', $id)->get();
+            return response()->json($entes);
+        }
+    }
+
     public function excel()
     {
         \Excel::download(new ExportarRegistroTickets, 'Tickets.xlsx');
@@ -47,12 +70,12 @@ class HomeController extends Controller
 
     public function create()
     {
-        $prioridad = \DB::select(\DB::raw('SELECT * FROM prioridad'));
-        $categoria = \DB::select(\DB::raw('SELECT * FROM categoria'));
-        $entidades = \DB::select(\DB::raw('SELECT * FROM entidad_federativa'));
-        $consulta = \DB::select(\DB::raw('SELECT * FROM medio_consulta'));
-        $entes = \DB::select(\DB::raw('SELECT id, nombre FROM ente_publico'));
-        $estatus = \DB::select(\DB::raw('SELECT * FROM estatus'));
+        $prioridad = \DB::table('prioridad')->get();
+        $categoria = \DB::table('categoria')->get();
+        $entidades = \DB::table('entidad_federativa')->get();
+        $consulta = \DB::table('medio_consulta')->get();
+        $entes = \DB::table('ente_publico')->get();
+        $estatus = \DB::table('estatus')->get();
         return view('registro_ticket.create', compact('prioridad', 'categoria', 'entidades', 'consulta', 'entes', 'estatus'));
     }
 
@@ -64,7 +87,6 @@ class HomeController extends Controller
                 ->orderBy('id', 'DESC')
                 ->limit(0)->limit(1)->get();
             $data = json_decode($data);
-            //$test = (array)$test;
             $arr = !$data ? $data : get_object_vars($data[0]);
             $sheetNumberYear = date('Y');
             if (!$arr || $arr['folio_registro'] == null)
@@ -87,43 +109,35 @@ class HomeController extends Controller
                 }
             }
             \DB::beginTransaction();
-            //dd($request->input('folio'));
-            $result = \DB::table('control_ticket')
-                ->orderBy('id', 'DESC')
-                ->limit(0)->limit(1)->get();
 
-            \DB::insert(\DB::raw('
-            INSERT INTO control_ticket (
-                ente_publico_id, prioridad_id, estatus_id, medio_consulta_id, categoria_id, users_id, folio_registro, folio, fecha_creacion, asunto, descripcion, fecha_solucion, observaciones, respuesta)
-                VALUES (:ente_publico_id, :prioridad_id, :estatus_id, :medio_consulta_id, :categoria_id, :users_id, :folio_registro, :folio, :fecha_creacion, :asunto, :descripcion, :fecha_solucion, :observaciones, :respuesta)'),
-                [
-                    'ente_publico_id' => $request->input('ente_publico'),
-                    'prioridad_id' => $request->input('prioridad'),
-                    'estatus_id' => $request->input('estatus'),
-                    'medio_consulta_id' => $request->input('medio_consulta'),
-                    'categoria_id' => $request->input('categoria'),
-                    'users_id' => \Auth::id(),
-                    'folio_registro' => $sheetNumber,
-                    'folio' => $request->input('folio'),
-                    'fecha_creacion' => $request->input('fecha_registro'),
-                    'asunto' => $request->input('asunto'),
-                    'descripcion' => $request->input('descripcion'),
-                    'fecha_solucion' => $request->input('fecha_respuesta'),
-                    'observaciones' => $request->input('observaciones'),
-                    'respuesta' => $request->input('respuesta')
+            \DB::table('control_ticket')
+                ->insert([
+                    [
+                        'ente_publico_id' => $request->input('ente_publico'),
+                        'prioridad_id' => $request->input('prioridad'),
+                        'estatus_id' => $request->input('estatus'),
+                        'medio_consulta_id' => $request->input('medio_consulta'),
+                        'categoria_id' => $request->input('categoria'),
+                        'users_id' => \Auth::id(),
+                        'folio_registro' => $sheetNumber,
+                        'folio' => $request->input('folio'),
+                        'fecha_creacion' => $request->input('fecha_registro'),
+                        'asunto' => $request->input('asunto'),
+                        'descripcion' => $request->input('descripcion'),
+                        'fecha_solucion' => $request->input('fecha_respuesta'),
+                        'observaciones' => $request->input('observaciones'),
+                        'respuesta' => $request->input('respuesta')
 
-                ]
-            );
-            \DB::update(\DB::raw('UPDATE ente_publico SET 
-                                            nombre_enlace = :nombre_enlace,
-                                            correo_electronico = :correo_electronico,
-                                            telefono = :telefono
-                                        WHERE id = :id'),
+                    ]
+                ]);
+
+            \DB::table('ente_publico')
+            ->where('id', $request->input('ente_publico'))
+            ->update(
                 [
                     'nombre_enlace' => $request->input('enlace'),
                     'correo_electronico' => $request->input('correo_electronico'),
-                    'telefono' => $request->input('telefono'),
-                    'id' => $request->input('ente_publico')
+                    'telefono' => $request->input('telefono')
                 ]
             );
             \DB::commit();
@@ -138,21 +152,20 @@ class HomeController extends Controller
 
     public function edit($id)
     {
-        $ticket = \DB::select(\DB::raw('select ef.id entidad_federativa_id, ct.*, ep.nombre_enlace, ep.correo_electronico, ep.telefono from control_ticket ct
-                join ente_publico ep on ct.ente_publico_id = ep.id 
-                join entidad_federativa ef on ep.entidad_federativa_id = ef.id
-                where ct.id = :id'),
-            [
-                'id' => $id
-            ]
-        );
+        $ticket = \DB::table('control_ticket AS ct')
+            ->select('ef.id AS entidad_federativa', 'ct.*', 'ep.nombre_enlace', 'ep.correo_electronico', 'ep.telefono')
+            ->join('ente_publico AS ep', 'ct.ente_publico_id', '=', 'ep.id')
+            ->join('entidad_federativa AS ef', 'ep.entidad_federativa_id', '=', 'ef.id')
+            ->where('ct.id', $id)->first();
         //dd($ticket);
-        $prioridad = \DB::select(\DB::raw('SELECT * FROM prioridad'));
-        $categoria = \DB::select(\DB::raw('SELECT * FROM categoria'));
-        $entidades = \DB::select(\DB::raw('SELECT * FROM entidad_federativa'));
-        $consulta = \DB::select(\DB::raw('SELECT * FROM medio_consulta'));
-        $entes = \DB::select(\DB::raw('SELECT id, nombre FROM ente_publico'));
-        $estatus = \DB::select(\DB::raw('SELECT * FROM estatus'));
+
+        $prioridad = \DB::table('prioridad')->get();
+        $categoria = \DB::table('categoria')->get();
+        $entidades = \DB::table('entidad_federativa')->get();
+        $consulta = \DB::table('medio_consulta')->get();
+        $entes = \DB::table('ente_publico')->get();
+        $estatus = \DB::table('estatus')->get();
+
         return view('registro_ticket.edit', compact('prioridad', 'categoria', 'entidades', 'consulta', 'entes', 'estatus', 'ticket'));
     }
 
@@ -161,52 +174,38 @@ class HomeController extends Controller
         try
         {
             \DB::beginTransaction();
-            //dd($request->all(), $id);
-            \DB::insert(\DB::raw('
-            UPDATE control_ticket SET
-                ente_publico_id = :ente_publico_id, 
-                prioridad_id = :prioridad_id, 
-                estatus_id = :estatus_id, 
-                medio_consulta_id = :medio_consulta_id, 
-                categoria_id = :categoria_id, 
-                users_id = :users_id, 
-                folio = :folio, 
-                fecha_creacion = :fecha_creacion, 
-                asunto = :asunto, 
-                descripcion = :descripcion, 
-                fecha_solucion = :fecha_solucion, 
-                observaciones = :observaciones, 
-                respuesta = :respuesta
-            WHERE id = :id'),
-                [
-                    'ente_publico_id' => $request->input('ente_publico'),
-                    'prioridad_id' => $request->input('prioridad'),
-                    'estatus_id' => $request->input('estatus'),
-                    'medio_consulta_id' => $request->input('medio_consulta'),
-                    'categoria_id' => $request->input('categoria'),
-                    'users_id' => \Auth::id(),
-                    'folio' => $request->input('folio'),
-                    'fecha_creacion' => $request->input('fecha_registro'),
-                    'asunto' => $request->input('asunto'),
-                    'descripcion' => $request->input('descripcion'),
-                    'fecha_solucion' => $request->input('fecha_respuesta'),
-                    'observaciones' => $request->input('observaciones'),
-                    'respuesta' => $request->input('respuesta'),
-                    'id' => $id
-                ]
-            );
-            \DB::update(\DB::raw('UPDATE ente_publico SET 
-                                            nombre_enlace = :nombre_enlace,
-                                            correo_electronico = :correo_electronico,
-                                            telefono = :telefono
-                                        WHERE id = :id'),
-                [
-                    'nombre_enlace' => $request->input('enlace'),
-                    'correo_electronico' => $request->input('correo_electronico'),
-                    'telefono' => $request->input('telefono'),
-                    'id' => $request->input('ente_publico')
-                ]
-            );
+
+            \DB::table('control_ticket')
+                ->where('id', $id)
+                ->update(
+                    [
+                        'ente_publico_id' => $request->input('ente_publico'),
+                        'prioridad_id' => $request->input('prioridad'),
+                        'estatus_id' => $request->input('estatus'),
+                        'medio_consulta_id' => $request->input('medio_consulta'),
+                        'categoria_id' => $request->input('categoria'),
+                        'users_id' => \Auth::id(),
+                        'folio' => $request->input('folio'),
+                        'fecha_creacion' => $request->input('fecha_registro'),
+                        'asunto' => $request->input('asunto'),
+                        'descripcion' => $request->input('descripcion'),
+                        'fecha_solucion' => $request->input('fecha_respuesta'),
+                        'observaciones' => $request->input('observaciones'),
+                        'respuesta' => $request->input('respuesta')
+
+                    ]
+                );
+
+            \DB::table('ente_publico')
+                ->where('id', $request->input('ente_publico'))
+                ->update(
+                    [
+                        'nombre_enlace' => $request->input('enlace'),
+                        'correo_electronico' => $request->input('correo_electronico'),
+                        'telefono' => $request->input('telefono')
+                    ]
+                );
+
             \DB::commit();
             return redirect()->route('/');
         }
@@ -222,7 +221,7 @@ class HomeController extends Controller
         try
         {
             \DB::beginTransaction();
-            \DB::delete(\DB::raw('DELETE FROM control_ticket WHERE id =:id'), ['id' => $id]);
+            \DB::table('control_ticket')->where('id', $id)->delete();
             \DB::commit();
             return redirect()->route('/');
         }
