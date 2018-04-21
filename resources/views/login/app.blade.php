@@ -1,4 +1,3 @@
-{{ Debugbar::addMessage(config('app.name')) }}
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -12,9 +11,18 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!--<link href="{# asset('css/app.css') #}" rel="stylesheet">-->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/font-awesome/css/font-awesome.min.css') }}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/Ionicons/css/ionicons.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ asset('assets/dist/css/AdminLTE.min.css') }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ asset('assets/iCheck/square/blue.css') }}">
 </head>
-<body>
+<body class="hold-transition @if (Request::is('login')) login-page @elseif (Request::is('register')) register-page @endif">
     <div id="app">
         <nav class="navbar navbar-default navbar-static-top">
             <div class="container">
@@ -30,7 +38,8 @@
 
                     <!-- Branding Image -->
                     <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
+                        {{-- config('app.name', 'Laravel') --}}
+                        Sistema de control de tickets
                     </a>
                 </div>
 
@@ -44,8 +53,8 @@
                     <ul class="nav navbar-nav navbar-right">
                         <!-- Authentication Links -->
                         @guest
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
+                            <li><a href="{{ route('login') }}">Ingresar</a></li>
+                            {{--<li><a href="{{ route('register') }}">Registrarse</a></li>--}}
                         @else
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true">
@@ -76,6 +85,21 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <!--<script src="{# asset('js/app.js') #}"></script>-->
+    <!-- jQuery 3 -->
+    <script src="{{ asset('assets/bower_components/jquery/dist/jquery.min.js') }}"></script>
+    <!-- Bootstrap 3.3.7 -->
+    <script src="{{ asset('assets/bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <!-- iCheck -->
+    <script src="{{ asset('assets/iCheck/icheck.min.js') }}"></script>
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+        });
+    </script>
 </body>
 </html>

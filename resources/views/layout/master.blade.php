@@ -7,9 +7,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Freddy | Servicio Eléctrico Automotríz</title>
+    <title>Auditoría Superior del Estado de Campeche</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/bootstrap/dist/css/bootstrap.min.css') }}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/bower_components/font-awesome/css/font-awesome.min.css') }}">
@@ -18,6 +19,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('assets/dist/css/AdminLTE.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/bower_components/select2/dist/css/select2.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
           page. However, you can choose any other skin. Make sure you
           apply the skin class to the body tag so the changes take effect. -->
@@ -65,9 +67,9 @@ desired effect
         <!-- Logo -->
         <a href="#" class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"><b>SE</b></span>
+            <span class="logo-mini"><b>SCT</b></span>
             <!-- logo for regular state and mobile devices -->
-            <span class="logo-lg"><b>Servicio Eléctrico</b></span>
+            <span class="logo-lg"><b>Control de Tickets</b></span>
         </a>
 
         <!-- Header Navbar -->
@@ -123,8 +125,10 @@ desired effect
 <!-- Bootstrap 3.3.7 -->
 <script src="{{ asset('assets/bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/bower_components/select2/dist/js/select2.js') }}"></script>
+<script src="{{ asset('assets/bower_components/select2/dist/js/select2.js') }}"></script>
 <!-- AdminLTE App -->
-<script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+<script src="{{ asset('assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
+<script src="{{ asset('assets/dist/js/custom.js') }}"></script>
 
 
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
